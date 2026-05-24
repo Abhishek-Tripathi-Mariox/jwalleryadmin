@@ -94,6 +94,14 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   category?: Category;
+  material?: string;
+  subCategoryId?: string;
+  goldPricing?: {
+    isEnabled: boolean;
+    weightGrams: number;
+    goldPurityPercent: number;
+    makingChargePercent: number;
+  };
 }
 
 // Order Types
