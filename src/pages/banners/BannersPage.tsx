@@ -15,11 +15,28 @@ import {
   Trash2,
   Power,
   Image as ImageIcon,
-  Video,
 } from "lucide-react";
 
 function isVideo(url: string) {
   return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
+}
+
+/**
+ * Effective banner status as it behaves on the storefront. The expire date is
+ * optional and does NOT hide a banner once it passes — only the Inactive flag
+ * (or a future start date) keeps a banner off the site. This mirrors the
+ * website's getActiveBanners() rule so admins see the real outcome.
+ */
+function bannerStatus(banner: Banner): {
+  label: string;
+  variant: "success" | "warning" | "danger";
+} {
+  if (!banner.isActive) return { label: "Inactive", variant: "danger" };
+  const now = Date.now();
+  if (banner.startDate && new Date(banner.startDate).getTime() > now) {
+    return { label: "Scheduled", variant: "warning" };
+  }
+  return { label: "Active", variant: "success" };
 }
 
 function MediaPreview({ src, alt, className }: { src: string; alt: string; className?: string }) {
@@ -202,11 +219,10 @@ export function BannersPage() {
     {
       key: "isActive" as const,
       header: "Status",
-      render: (banner: Banner) => (
-        <Badge variant={banner.isActive ? "success" : "danger"}>
-          {banner.isActive ? "Active" : "Inactive"}
-        </Badge>
-      ),
+      render: (banner: Banner) => {
+        const status = bannerStatus(banner);
+        return <Badge variant={status.variant}>{status.label}</Badge>;
+      },
     },
     {
       key: "_id" as const,

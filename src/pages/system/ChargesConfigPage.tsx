@@ -15,6 +15,8 @@ type FormState = {
   platformFeeActive: boolean;
   platformFeeFlat: string;
   platformFeePercent: string;
+  prepaidDiscountActive: boolean;
+  prepaidDiscountPercent: string;
 };
 
 const toForm = (c: ChargeConfig): FormState => ({
@@ -24,6 +26,8 @@ const toForm = (c: ChargeConfig): FormState => ({
   platformFeeActive: !!c.platformFeeActive,
   platformFeeFlat: String(c.platformFeeFlat ?? 0),
   platformFeePercent: String(c.platformFeePercent ?? 0),
+  prepaidDiscountActive: c.prepaidDiscountActive ?? true,
+  prepaidDiscountPercent: String(c.prepaidDiscountPercent ?? 2),
 });
 
 const blank: FormState = {
@@ -33,6 +37,8 @@ const blank: FormState = {
   platformFeeActive: false,
   platformFeeFlat: "0",
   platformFeePercent: "0",
+  prepaidDiscountActive: true,
+  prepaidDiscountPercent: "2",
 };
 
 const fmt = (n: number) =>
@@ -80,6 +86,8 @@ export const ChargesConfigPage: React.FC = () => {
         platformFeeActive: form.platformFeeActive,
         platformFeeFlat: Number(form.platformFeeFlat) || 0,
         platformFeePercent: Number(form.platformFeePercent) || 0,
+        prepaidDiscountActive: form.prepaidDiscountActive,
+        prepaidDiscountPercent: Number(form.prepaidDiscountPercent) || 0,
       };
       const res = await chargeConfigService.update(patch);
       if (res?.code === 1 && res.data) {
@@ -243,6 +251,53 @@ export const ChargesConfigPage: React.FC = () => {
                 disabled={!form.platformFeeActive}
               />
             </div>
+          </div>
+
+          {/* Prepaid discount card */}
+          <div className="bg-white rounded-lg shadow p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Percent className="w-5 h-5 text-[#B8860B]" />
+                <h2 className="font-semibold text-gray-900">Prepaid discount</h2>
+              </div>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={form.prepaidDiscountActive}
+                  onChange={(e) =>
+                    setField("prepaidDiscountActive")(e.target.checked)
+                  }
+                />
+                <span className="w-10 h-6 rounded-full bg-gray-200 peer-checked:bg-[#B8860B] relative transition-colors">
+                  <span
+                    className={`absolute top-0.5 left-0.5 h-5 w-5 bg-white rounded-full transition-transform ${
+                      form.prepaidDiscountActive ? "translate-x-4" : ""
+                    }`}
+                  />
+                </span>
+                <span className="text-sm text-gray-700">
+                  {form.prepaidDiscountActive ? "Active" : "Disabled"}
+                </span>
+              </label>
+            </div>
+
+            <p className="text-sm text-gray-500">
+              Customers who choose to pay online (prepaid) get this % off the
+              subtotal automatically. Cash-on-Delivery orders never get it.
+            </p>
+
+            <Input
+              label="Prepaid discount (%)"
+              type="number"
+              min={0}
+              step="0.01"
+              value={form.prepaidDiscountPercent}
+              onChange={(e) =>
+                setField("prepaidDiscountPercent")(e.target.value)
+              }
+              disabled={!form.prepaidDiscountActive}
+            />
           </div>
 
           <div className="flex items-center justify-between">

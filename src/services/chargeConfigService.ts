@@ -9,6 +9,8 @@ export interface ChargeConfig {
   platformFeeActive: boolean;
   platformFeeFlat: number;
   platformFeePercent: number;
+  prepaidDiscountActive?: boolean;
+  prepaidDiscountPercent?: number;
   updatedAt?: string;
 }
 

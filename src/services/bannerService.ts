@@ -45,7 +45,7 @@ export const bannerService = {
 
   createBanner: async (data: FormData): Promise<ApiResponse<Banner>> => {
     const response = await api.post("/admin/banners", data, {
-      headers: { "Content-Type": undefined },
+      headers: { "Content-Type": "multipart/form-data" },
       timeout: 120000,
     });
     return response.data;
@@ -56,7 +56,7 @@ export const bannerService = {
     data: FormData,
   ): Promise<ApiResponse<Banner>> => {
     const response = await api.put(`/admin/banners/${id}`, data, {
-      headers: { "Content-Type": undefined },
+      headers: { "Content-Type": "multipart/form-data" },
       timeout: 120000,
     });
     return response.data;

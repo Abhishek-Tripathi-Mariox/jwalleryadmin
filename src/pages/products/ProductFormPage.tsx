@@ -24,6 +24,7 @@ export const ProductFormPage: React.FC = () => {
     productName: "",
     brand: "",
     categoryId: "",
+    material: "",
     price: "",
     discountPrice: "",
     discountPercent: "",
@@ -99,10 +100,18 @@ export const ProductFormPage: React.FC = () => {
       const res = await productService.getProduct(productId);
       if (res.code === 1) {
         const p = res.data;
+        // The backend populates categoryId as { _id, categoryName }; the
+        // <select> matches options by string id, so extract the id (otherwise
+        // the dropdown silently falls back to the first category and saving
+        // sends "[object Object]", which fails to cast → "failed to update").
+        const catRaw: any = p.categoryId;
+        const categoryIdStr =
+          catRaw && typeof catRaw === "object" ? catRaw._id : catRaw || "";
         setFormData({
           productName: p.productName || "",
           brand: p.brand || "",
-          categoryId: p.categoryId || "",
+          categoryId: categoryIdStr,
+          material: (p as any).material || "",
           price: String(p.price || ""),
           discountPrice: String(p.discountPrice || ""),
           discountPercent: String(p.discountPercent || ""),
@@ -220,6 +229,7 @@ export const ProductFormPage: React.FC = () => {
       fd.append("productName", formData.productName.trim());
       fd.append("brand", formData.brand.trim());
       fd.append("categoryId", formData.categoryId);
+      fd.append("material", formData.material);
       fd.append("price", formData.price);
       fd.append("discountPrice", formData.discountPrice || "0");
       fd.append("discountPercent", formData.discountPercent || "0");
@@ -333,6 +343,24 @@ export const ProductFormPage: React.FC = () => {
           {errors.categoryId && (
             <p className="text-sm text-red-500 -mt-2">{errors.categoryId}</p>
           )}
+
+          <Select
+            label="Material"
+            name="material"
+            value={formData.material}
+            onChange={handleChange}
+            options={[
+              "22K Gold",
+              "18K Gold",
+              "24K Gold",
+              "999 Silver",
+              "Rose Gold",
+              "Pearl",
+              "Stone",
+              "Diamond",
+            ].map((m) => ({ value: m, label: m }))}
+            placeholder="Select a material (optional)"
+          />
         </div>
 
         {/* Pricing */}

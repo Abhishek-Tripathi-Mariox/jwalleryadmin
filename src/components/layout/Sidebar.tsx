@@ -33,6 +33,8 @@ import {
   Truck,
   MessageCircle,
   FileText,
+  Star,
+  Film,
 } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { useLogoStore } from "../../store/logoStore";
@@ -73,6 +75,8 @@ const menuGroups: (MenuItem | MenuGroup)[] = [
     icon: Megaphone,
     items: [
       { icon: ImageIcon, label: "Banners", path: "/banners", permissionKey: "banners" },
+      { icon: Star, label: "Customer Reviews", path: "/customer-reviews", permissionKey: "customer-reviews" },
+      { icon: Film, label: "Reels", path: "/reels", permissionKey: "reels" },
       { icon: Tag, label: "Coupons", path: "/coupons", permissionKey: "coupons" },
       { icon: Bell, label: "Notifications", path: "/notifications", permissionKey: "notifications" },
       { icon: MessageCircle, label: "Contact Submissions", path: "/contact-submissions", permissionKey: "contact-submissions" },
@@ -84,6 +88,7 @@ const menuGroups: (MenuItem | MenuGroup)[] = [
     items: [
       { icon: Smartphone, label: "Home Screen", path: "/home-screen", permissionKey: "home-screen" },
       { icon: FolderTree, label: "Categories", path: "/categories", permissionKey: "categories" },
+      { icon: FolderTree, label: "Subcategories", path: "/subcategories", permissionKey: "categories" },
       { icon: Package, label: "Products", path: "/products", permissionKey: "products" },
       { icon: FileText, label: "Static Pages", path: "/static-pages", permissionKey: "static-pages" },
     ],

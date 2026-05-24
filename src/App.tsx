@@ -20,6 +20,7 @@ import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 // Dashboard Pages
 import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { CategoriesPage } from "./pages/categories/CategoriesPage";
+import { SubCategoriesPage } from "./pages/subcategories/SubCategoriesPage";
 import { ProductsPage } from "./pages/products/ProductsPage";
 import { ProductFormPage } from "./pages/products/ProductFormPage";
 import { UsersPage } from "./pages/users/UsersPage";
@@ -27,6 +28,8 @@ import { OrdersPage } from "./pages/orders/OrdersPage";
 import { PaymentsPage } from "./pages/payments/PaymentsPage";
 import { SettingsPage } from "./pages/settings/SettingsPage";
 import { BannersPage } from "./pages/banners/BannersPage";
+import { CustomerReviewsPage } from "./pages/customer-reviews/CustomerReviewsPage";
+import { ReelsPage } from "./pages/reels/ReelsPage";
 import { CouponsPage } from "./pages/coupons/CouponsPage";
 import { HomeScreenPage } from "./pages/homescreen/HomeScreenPage";
 import { SmsConfigPage } from "./pages/system/SmsConfigPage";
@@ -87,11 +90,14 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/home-screen" element={<HomeScreenPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/subcategories" element={<SubCategoriesPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/new" element={<ProductFormPage />} />
             <Route path="/products/:id" element={<ProductFormPage />} />
             <Route path="/products/:id/edit" element={<ProductFormPage />} />
             <Route path="/banners" element={<BannersPage />} />
+            <Route path="/customer-reviews" element={<CustomerReviewsPage />} />
+            <Route path="/reels" element={<ReelsPage />} />
             <Route path="/coupons" element={<CouponsPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/orders" element={<OrdersPage />} />
