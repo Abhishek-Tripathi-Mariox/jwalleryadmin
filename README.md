@@ -72,3 +72,4 @@ export default defineConfig([
 ])
 ```
 # swarz-admin-panel
+# jwalleryadmin
