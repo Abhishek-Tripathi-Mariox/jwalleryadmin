@@ -14,6 +14,7 @@ export const userService = {
     limit = 10,
     search = "",
     status = "",
+    city = "",
   ): Promise<ApiResponse<UsersResponse>> => {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -21,6 +22,7 @@ export const userService = {
     });
     if (search) params.append("search", search);
     if (status) params.append("status", status);
+    if (city) params.append("city", city);
 
     const response = await api.get(`/admin/users?${params.toString()}`);
     return response.data;

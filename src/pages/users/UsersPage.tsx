@@ -26,6 +26,7 @@ export const UsersPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [limit] = useState(10);
@@ -38,12 +39,12 @@ export const UsersPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, search, statusFilter]);
+  }, [page, search, statusFilter, cityFilter]);
 
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const res = await userService.getUsers(page, limit, search, statusFilter);
+      const res = await userService.getUsers(page, limit, search, statusFilter, cityFilter);
       if (res.code === 1) {
         setUsers(res.data.users);
         setTotal(res.data.total);
@@ -179,6 +180,13 @@ export const UsersPage: React.FC = () => {
               leftIcon={<Search className="w-5 h-5" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="w-full sm:w-48">
+            <Input
+              placeholder="Filter by city..."
+              value={cityFilter}
+              onChange={(e) => setCityFilter(e.target.value)}
             />
           </div>
           <div className="w-full sm:w-48">
