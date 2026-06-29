@@ -25,7 +25,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url || "";
+    // Don't treat a failed login/auth attempt as a session expiry — let the
+    // page show "Invalid email or password" instead of redirecting/reloading.
+    const isAuthRequest = url.includes("/auth/");
+    if (error.response?.status === 401 && !isAuthRequest) {
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminUser");
       window.location.href = "/login";
