@@ -246,7 +246,7 @@ export const SmsConfigPage: React.FC = () => {
 
         <p className="text-sm text-gray-500 mb-6 bg-amber-50 border border-amber-200 rounded-lg p-3">
           Credentials are encrypted with AES-256 before storing in the database.
-          Enter all fields to update the configuration.
+          Enter the approved MSG91 auth key, OTP template ID, and sender ID to update the configuration.
         </p>
 
         <form onSubmit={handleSubmit} className="max-w-lg space-y-5">
@@ -290,8 +290,8 @@ export const SmsConfigPage: React.FC = () => {
           />
 
           <Input
-            label="Template ID"
-            placeholder="Enter MSG91 Template ID"
+            label="OTP Template ID"
+            placeholder="Enter approved MSG91 OTP Template ID"
             value={formData.templateId}
             onChange={(e) =>
               setFormData({ ...formData, templateId: e.target.value })
