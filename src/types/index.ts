@@ -67,6 +67,11 @@ export interface ProductImage {
   url: string;
 }
 
+export interface RotationImage {
+  url: string;
+  order: number;
+}
+
 export interface Product {
   _id: string;
   productName: string;
@@ -74,6 +79,9 @@ export interface Product {
   shopId: string;
   categoryId: string;
   productImages: ProductImage[];
+  rotationImages: RotationImage[];
+  model3dUrl?: string;
+  arModelUrl?: string;
   colors: ProductColor[];
   sizes: ProductSize[];
   price: number;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, X, Plus } from "lucide-react";
+import { ArrowLeft, X, Plus, Box, Upload } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
@@ -45,6 +45,14 @@ export const ProductFormPage: React.FC = () => {
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [rotationImageFiles, setRotationImageFiles] = useState<File[]>([]);
+  const [existingRotationImages, setExistingRotationImages] = useState<
+    string[]
+  >([]);
+  const [model3dFile, setModel3dFile] = useState<File | null>(null);
+  const [existingModel3dUrl, setExistingModel3dUrl] = useState("");
+  const [arModelFile, setArModelFile] = useState<File | null>(null);
+  const [existingArModelUrl, setExistingArModelUrl] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const toast = useToast();
@@ -128,6 +136,14 @@ export const ProductFormPage: React.FC = () => {
         setExistingImages(
           p.productImages?.map((img) => img.url).filter(Boolean) || [],
         );
+        setExistingRotationImages(
+          [...(p.rotationImages || [])]
+            .sort((a, b) => a.order - b.order)
+            .map((img) => img.url)
+            .filter(Boolean),
+        );
+        setExistingModel3dUrl(p.model3dUrl || "");
+        setExistingArModelUrl(p.arModelUrl || "");
       }
     } catch {
       toast.error("Failed to load product");
@@ -199,6 +215,40 @@ export const ProductFormPage: React.FC = () => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // 360° turntable frames — same add/remove pattern as product images, but
+  // uploading new frames replaces the whole existing set (order matters and
+  // the backend just re-numbers by upload order, so partial merges would be
+  // ambiguous). No hard cap other than a sane upper bound for a turntable set.
+  const handleRotationImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + rotationImageFiles.length > 60) {
+      toast.error("Maximum 60 rotation frames allowed");
+      return;
+    }
+    setRotationImageFiles((prev) => [...prev, ...files]);
+    e.target.value = "";
+  };
+
+  const removeNewRotationImage = (index: number) => {
+    setRotationImageFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingRotationImage = (index: number) => {
+    setExistingRotationImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleModel3dChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setModel3dFile(file);
+    e.target.value = "";
+  };
+
+  const handleArModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setArModelFile(file);
+    e.target.value = "";
+  };
+
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -255,6 +305,14 @@ export const ProductFormPage: React.FC = () => {
       for (const file of imageFiles) {
         fd.append("productImages", file);
       }
+
+      // 360° frames — append in the order shown, which becomes playback order
+      for (const file of rotationImageFiles) {
+        fd.append("rotationImages", file);
+      }
+
+      if (model3dFile) fd.append("model3d", model3dFile);
+      if (arModelFile) fd.append("arModel", arModelFile);
 
       if (isEdit && id) {
         await productService.updateProduct(id, fd);
@@ -600,6 +658,164 @@ export const ProductFormPage: React.FC = () => {
           {errors.images && (
             <p className="text-sm text-red-500">{errors.images}</p>
           )}
+        </div>
+
+        {/* 360° Turntable Images */}
+        <div className="bg-white rounded-lg shadow p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900">
+            360° Turntable Images (optional)
+          </h2>
+          <p className="text-sm text-gray-500">
+            Powers the 360° spin viewer on the product page. Upload 20-36
+            photos of the product shot on a turntable, one every 10-15°, in
+            rotation order — the order you add them here is the order they'll
+            play in. Leave empty to skip 360° for this product.
+          </p>
+
+          <div className="flex flex-wrap gap-3">
+            {existingRotationImages.map((url, i) => (
+              <div key={`existing-rot-${i}`} className="relative group">
+                <img
+                  src={url}
+                  alt={`Frame ${i + 1}`}
+                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                />
+                <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center rounded-b-lg">
+                  {i + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeExistingRotationImage(i)}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+
+            {rotationImageFiles.map((file, i) => (
+              <div key={`new-rot-${i}`} className="relative group">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`New frame ${i + 1}`}
+                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                />
+                <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] text-center rounded-b-lg">
+                  {existingRotationImages.length + i + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeNewRotationImage(i)}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+
+            <label className="w-16 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#B8860B] hover:bg-[#fdf8ec] transition-colors">
+              <Plus className="w-5 h-5 text-gray-400" />
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleRotationImageAdd}
+              />
+            </label>
+          </div>
+          {rotationImageFiles.length > 0 && (
+            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              Saving will replace the existing 360° set with these{" "}
+              {rotationImageFiles.length} new frame
+              {rotationImageFiles.length === 1 ? "" : "s"} (in the order shown
+              above).
+            </p>
+          )}
+        </div>
+
+        {/* 3D / AR Model */}
+        <div className="bg-white rounded-lg shadow p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-900">
+            3D / AR Model (optional)
+          </h2>
+          <p className="text-sm text-gray-500">
+            Powers the 3D/AR viewer on the product page. Requires an actual 3D
+            model of the product (from CAD files or a photogrammetry scan) —
+            these aren't generated from photos automatically.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                3D model (.glb) — web &amp; Android AR
+              </label>
+              {model3dFile || existingModel3dUrl ? (
+                <div className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg">
+                  <Box className="w-4 h-4 text-[#B8860B] shrink-0" />
+                  <span className="text-sm text-gray-700 truncate flex-1">
+                    {model3dFile?.name || "Current model.glb"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModel3dFile(null);
+                      setExistingModel3dUrl("");
+                    }}
+                    className="text-gray-400 hover:text-red-500"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#B8860B] hover:bg-[#fdf8ec] transition-colors">
+                  <Upload className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-gray-500">Upload .glb file</span>
+                  <input
+                    type="file"
+                    accept=".glb,.gltf"
+                    className="hidden"
+                    onChange={handleModel3dChange}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                AR Quick Look (.usdz) — iOS only
+              </label>
+              {arModelFile || existingArModelUrl ? (
+                <div className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg">
+                  <Box className="w-4 h-4 text-[#B8860B] shrink-0" />
+                  <span className="text-sm text-gray-700 truncate flex-1">
+                    {arModelFile?.name || "Current model.usdz"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setArModelFile(null);
+                      setExistingArModelUrl("");
+                    }}
+                    className="text-gray-400 hover:text-red-500"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#B8860B] hover:bg-[#fdf8ec] transition-colors">
+                  <Upload className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm text-gray-500">Upload .usdz file</span>
+                  <input
+                    type="file"
+                    accept=".usdz"
+                    className="hidden"
+                    onChange={handleArModelChange}
+                  />
+                </label>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Description */}
