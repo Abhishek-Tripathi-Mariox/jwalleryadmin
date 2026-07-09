@@ -52,6 +52,7 @@ export interface PaymentConfig {
   credentials: {
     keyId: string;
     keySecret: string;
+    webhookSecret?: string;
   };
   isActive: boolean;
   updatedAt: string;
@@ -62,6 +63,7 @@ export interface PaymentConfigForm {
   provider: string;
   keyId: string;
   keySecret: string;
+  webhookSecret?: string;
 }
 
 export interface GoogleMapsConfig {

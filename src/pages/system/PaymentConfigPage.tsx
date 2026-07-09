@@ -30,9 +30,12 @@ export const PaymentConfigPage: React.FC = () => {
     provider: "razorpay",
     keyId: "",
     keySecret: "",
+    webhookSecret: "",
   });
 
   const toast = useToast();
+
+  const webhookUrl = `${(import.meta.env.VITE_API_BASE_URL || "http://localhost:9110/v1/api").replace(/\/$/, "")}/webhooks/razorpay`;
 
   useEffect(() => {
     fetchConfig();
@@ -47,6 +50,7 @@ export const PaymentConfigPage: React.FC = () => {
           provider: response.data.provider,
           keyId: "",
           keySecret: "",
+          webhookSecret: "",
         });
       }
     } catch {
@@ -68,7 +72,7 @@ export const PaymentConfigPage: React.FC = () => {
     try {
       await systemConfigService.savePaymentConfig(formData);
       toast.success("Payment configuration saved successfully!");
-      setFormData({ ...formData, keyId: "", keySecret: "" });
+      setFormData({ ...formData, keyId: "", keySecret: "", webhookSecret: "" });
       await fetchConfig();
     } catch {
       toast.error("Failed to save payment configuration");
@@ -162,6 +166,28 @@ export const PaymentConfigPage: React.FC = () => {
               <p className="text-sm font-mono text-gray-900 mt-1">
                 {existingConfig.credentials.keySecret}
               </p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide">
+                Webhook
+              </p>
+              <div className="flex items-center gap-1.5 mt-1">
+                {existingConfig.credentials.webhookSecret ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-sm font-medium text-green-700">
+                      Configured
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm font-medium text-amber-700">
+                      Not set up
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <p className="text-xs text-gray-500 uppercase tracking-wide">
@@ -269,6 +295,34 @@ export const PaymentConfigPage: React.FC = () => {
               </button>
             }
           />
+
+          <div>
+            <Input
+              label="Webhook Secret (optional, but strongly recommended)"
+              type={showKeySecret ? "text" : "password"}
+              placeholder="Paste the secret you set for this webhook in Razorpay"
+              value={formData.webhookSecret}
+              onChange={(e) =>
+                setFormData({ ...formData, webhookSecret: e.target.value })
+              }
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Without this, payments only get confirmed when the customer's app calls back —
+              if they close the app right after paying, the order can get stuck as "pending"
+              even though Razorpay captured the money. Set up the webhook below to fix that.
+            </p>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-xs font-medium text-blue-900 uppercase tracking-wide mb-1">
+              Webhook URL — add this in Razorpay Dashboard → Settings → Webhooks
+            </p>
+            <p className="text-sm font-mono text-blue-900 break-all">{webhookUrl}</p>
+            <p className="text-xs text-blue-800 mt-1">
+              Active events to select there: <strong>payment.captured</strong> and{" "}
+              <strong>payment.failed</strong>. Use the same secret you enter above.
+            </p>
+          </div>
 
           <Button
             type="submit"
