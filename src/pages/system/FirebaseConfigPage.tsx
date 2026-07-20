@@ -16,6 +16,7 @@ import { useToast } from "../../store/toastStore";
 import {
   systemConfigService,
   type FirebaseConfig,
+  type FirebaseAdminConfig,
 } from "../../services/systemConfigService";
 
 export const FirebaseConfigPage: React.FC = () => {
@@ -34,10 +35,19 @@ export const FirebaseConfigPage: React.FC = () => {
     appId: "",
   });
 
+  // Server-side push credential (service account JSON) — separate from the
+  // client config above, never sent to the mobile app.
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
+  const [isAdminFetching, setIsAdminFetching] = useState(true);
+  const [existingAdminConfig, setExistingAdminConfig] =
+    useState<FirebaseAdminConfig | null>(null);
+  const [serviceAccountJson, setServiceAccountJson] = useState("");
+
   const toast = useToast();
 
   useEffect(() => {
     fetchConfig();
+    fetchAdminConfig();
   }, []);
 
   const fetchConfig = async () => {
@@ -50,6 +60,61 @@ export const FirebaseConfigPage: React.FC = () => {
       // No config exists yet
     } finally {
       setIsFetching(false);
+    }
+  };
+
+  const fetchAdminConfig = async () => {
+    try {
+      const response = await systemConfigService.getFirebaseAdminConfig();
+      if (response.data && response.data._id) {
+        setExistingAdminConfig(response.data);
+      }
+    } catch {
+      // No config exists yet
+    } finally {
+      setIsAdminFetching(false);
+    }
+  };
+
+  const handleAdminSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!serviceAccountJson.trim()) {
+      toast.error("Paste the service account JSON first");
+      return;
+    }
+    try {
+      JSON.parse(serviceAccountJson);
+    } catch {
+      toast.error("That's not valid JSON — paste the full key file contents");
+      return;
+    }
+    setIsAdminLoading(true);
+    try {
+      await systemConfigService.saveFirebaseAdminConfig({ serviceAccountJson });
+      toast.success("Push notification credentials saved!");
+      setServiceAccountJson("");
+      await fetchAdminConfig();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to save credentials");
+    } finally {
+      setIsAdminLoading(false);
+    }
+  };
+
+  const handleToggleAdminStatus = async () => {
+    try {
+      const response = await systemConfigService.toggleFirebaseAdminStatus();
+      if (existingAdminConfig) {
+        setExistingAdminConfig({
+          ...existingAdminConfig,
+          isActive: response.data.isActive,
+        });
+      }
+      toast.success(
+        `Push notifications ${response.data.isActive ? "activated" : "deactivated"}`,
+      );
+    } catch {
+      toast.error("Failed to toggle status");
     }
   };
 
@@ -271,6 +336,75 @@ export const FirebaseConfigPage: React.FC = () => {
             leftIcon={<Save className="w-4 h-4" />}
           >
             Save Configuration
+          </Button>
+        </form>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-[#B8860B]" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              Server Push Notifications
+            </h2>
+          </div>
+          {existingAdminConfig && (
+            <button
+              onClick={handleToggleAdminStatus}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                existingAdminConfig.isActive
+                  ? "bg-green-100 text-green-700 hover:bg-green-200"
+                  : "bg-red-100 text-red-700 hover:bg-red-200"
+              }`}
+            >
+              <Power className="w-4 h-4" />
+              {existingAdminConfig.isActive ? "Active" : "Inactive"}
+            </button>
+          )}
+        </div>
+
+        <p className="text-sm text-gray-500 mb-4 bg-amber-50 border border-amber-200 rounded-lg p-3">
+          This is a separate, more sensitive credential — the service account
+          key that lets the backend actually <strong>send</strong> push
+          notifications via Firebase Cloud Messaging. Get it from Firebase
+          Console &gt; Project Settings &gt; Service Accounts &gt; Generate
+          new private key. It is AES-256 encrypted at rest and never sent to
+          the mobile app.
+        </p>
+
+        {existingAdminConfig && (
+          <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">
+              Current Service Account
+            </p>
+            <p className="text-sm font-mono text-gray-900 mt-1">
+              {existingAdminConfig.credentials.serviceAccountJson}
+            </p>
+          </div>
+        )}
+
+        <form onSubmit={handleAdminSubmit} className="max-w-lg space-y-4">
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Service Account JSON
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+            <textarea
+              rows={6}
+              placeholder='Paste the full contents of the downloaded JSON key file, e.g. {"type": "service_account", "project_id": "...", ...}'
+              value={serviceAccountJson}
+              onChange={(e) => setServiceAccountJson(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-[#B8860B] focus:border-transparent"
+              disabled={isAdminFetching}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            isLoading={isAdminLoading}
+            leftIcon={<Save className="w-4 h-4" />}
+          >
+            Save Push Credentials
           </Button>
         </form>
       </div>

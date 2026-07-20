@@ -108,6 +108,22 @@ export interface FirebaseConfigForm {
   appId: string;
 }
 
+export interface FirebaseAdminConfig {
+  _id: string;
+  configType: "firebase_admin";
+  provider: string;
+  credentials: {
+    serviceAccountJson: string; // masked when returned from the API
+  };
+  isActive: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+
+export interface FirebaseAdminConfigForm {
+  serviceAccountJson: string;
+}
+
 export interface ChatBotMessage {
   id: number;
   question: string;
@@ -234,6 +250,22 @@ export const systemConfigService = {
 
   toggleFirebaseStatus: async (): Promise<ApiResponse<{ isActive: boolean }>> => {
     const response = await api.patch("/admin/system-config/firebase/status");
+    return response.data;
+  },
+
+  // Firebase Admin (server-side push credential — service account JSON)
+  getFirebaseAdminConfig: async (): Promise<ApiResponse<FirebaseAdminConfig | null>> => {
+    const response = await api.get("/admin/system-config/firebase-admin");
+    return response.data;
+  },
+
+  saveFirebaseAdminConfig: async (data: FirebaseAdminConfigForm): Promise<ApiResponse<null>> => {
+    const response = await api.post("/admin/system-config/firebase-admin", data);
+    return response.data;
+  },
+
+  toggleFirebaseAdminStatus: async (): Promise<ApiResponse<{ isActive: boolean }>> => {
+    const response = await api.patch("/admin/system-config/firebase-admin/status");
     return response.data;
   },
 
