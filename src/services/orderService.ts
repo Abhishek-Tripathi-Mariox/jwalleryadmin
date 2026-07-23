@@ -43,6 +43,13 @@ export const orderService = {
     return response.data;
   },
 
+  // COD only — marks cash collected. Online payments update automatically
+  // via Razorpay verification/webhook and should never use this.
+  markPaymentReceived: async (id: string): Promise<ApiResponse<Order>> => {
+    const response = await api.patch(`/admin/orders/${id}/payment-received`);
+    return response.data;
+  },
+
   getOrderStats: async (): Promise<
     ApiResponse<{
       total: number;

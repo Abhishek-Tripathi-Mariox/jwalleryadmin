@@ -93,6 +93,24 @@ export const OrdersPage: React.FC = () => {
     }
   };
 
+  const [isMarkingPaid, setIsMarkingPaid] = useState(false);
+  const handleMarkPaymentReceived = async (orderId: string) => {
+    if (!window.confirm("Mark this order's payment as received (cash collected)?")) return;
+    setIsMarkingPaid(true);
+    try {
+      const res = await orderService.markPaymentReceived(orderId);
+      toast.success("Payment marked as received");
+      if (res?.data) {
+        setSelectedOrder((prev) => (prev ? { ...prev, ...res.data } : prev));
+      }
+      fetchOrders();
+    } catch (error) {
+      toast.error("Failed to mark payment as received");
+    } finally {
+      setIsMarkingPaid(false);
+    }
+  };
+
 
 
   const columns = [
@@ -473,17 +491,30 @@ export const OrdersPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Payment Status</p>
-                  <Badge
-                    variant={
-                      selectedOrder.paymentStatus === "paid"
-                        ? "success"
-                        : selectedOrder.paymentStatus === "failed"
-                          ? "danger"
-                          : "warning"
-                    }
-                  >
-                    {selectedOrder.paymentStatus.toUpperCase()}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={
+                        selectedOrder.paymentStatus === "paid"
+                          ? "success"
+                          : selectedOrder.paymentStatus === "failed"
+                            ? "danger"
+                            : "warning"
+                      }
+                    >
+                      {selectedOrder.paymentStatus.toUpperCase()}
+                    </Badge>
+                    {selectedOrder.paymentMode === "cod" &&
+                      selectedOrder.paymentStatus !== "paid" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          isLoading={isMarkingPaid}
+                          onClick={() => handleMarkPaymentReceived(selectedOrder._id)}
+                        >
+                          Mark as Paid
+                        </Button>
+                      )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Order Date</p>
