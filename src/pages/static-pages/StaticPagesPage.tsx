@@ -13,7 +13,6 @@ import {
 const COMMON_SLUGS = [
   { v: "about-us", l: "About Us" },
   { v: "our-story", l: "Our Story" },
-  { v: "store-locator", l: "Store Locator" },
   { v: "privacy-policy", l: "Privacy Policy" },
   { v: "terms", l: "Terms of Service" },
   { v: "shipping-policy", l: "Shipping Policy" },

@@ -38,6 +38,7 @@ export const MODULES = [
   { key: "home-screen", label: "Home Screen", group: "Website Management" },
   { key: "categories", label: "Categories", group: "Website Management" },
   { key: "products", label: "Products", group: "Website Management" },
+  { key: "stores", label: "Store Locator", group: "Website Management" },
   { key: "system-sms", label: "SMS Config", group: "System Management" },
   { key: "system-email", label: "Email Config", group: "System Management" },
   { key: "system-payment", label: "Payment Config", group: "System Management" },

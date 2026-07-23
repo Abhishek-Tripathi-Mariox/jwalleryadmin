@@ -44,6 +44,7 @@ import { ChargesConfigPage } from "./pages/system/ChargesConfigPage";
 import { NotificationsPage } from "./pages/notifications/NotificationsPage";
 import { ContactSubmissionsPage } from "./pages/contact/ContactSubmissionsPage";
 import { StaticPagesPage } from "./pages/static-pages/StaticPagesPage";
+import { StoresPage } from "./pages/stores/StoresPage";
 import { RolesPage } from "./pages/team/RolesPage";
 import { StaffPage } from "./pages/team/StaffPage";
 
@@ -114,6 +115,7 @@ function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/contact-submissions" element={<ContactSubmissionsPage />} />
             <Route path="/static-pages" element={<StaticPagesPage />} />
+            <Route path="/stores" element={<StoresPage />} />
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/staff" element={<StaffPage />} />
             <Route path="/settings" element={<SettingsPage />} />

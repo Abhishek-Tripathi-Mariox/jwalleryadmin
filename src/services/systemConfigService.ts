@@ -237,6 +237,13 @@ export const systemConfigService = {
     return response.data;
   },
 
+  // Raw (unmasked) key, for embedding the Maps JS SDK — e.g. the Store
+  // location picker. Only ever called from admin-authenticated screens.
+  getGoogleMapsKey: async (): Promise<ApiResponse<{ apiKey: string }>> => {
+    const response = await api.get("/admin/system-config/google-maps/key");
+    return response.data;
+  },
+
   // Firebase
   getFirebaseConfig: async (): Promise<ApiResponse<FirebaseConfig | null>> => {
     const response = await api.get("/admin/system-config/firebase");

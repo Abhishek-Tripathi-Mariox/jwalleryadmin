@@ -35,6 +35,7 @@ import {
   FileText,
   Star,
   Film,
+  Store,
 } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { useLogoStore } from "../../store/logoStore";
@@ -91,6 +92,7 @@ const menuGroups: (MenuItem | MenuGroup)[] = [
       { icon: FolderTree, label: "Subcategories", path: "/subcategories", permissionKey: "categories" },
       { icon: Package, label: "Products", path: "/products", permissionKey: "products" },
       { icon: FileText, label: "Static Pages", path: "/static-pages", permissionKey: "static-pages" },
+      { icon: Store, label: "Store Locator", path: "/stores", permissionKey: "stores" },
     ],
   },
   {
