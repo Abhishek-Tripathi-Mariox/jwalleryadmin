@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Eye, Filter, CheckCircle2, Package, Truck, Home, XCircle, Save } from "lucide-react";
+import { Search, Eye, Filter, CheckCircle2, Package, Truck, Home, XCircle, Save, FileText } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
@@ -90,6 +90,18 @@ export const OrdersPage: React.FC = () => {
       toast.error("Failed to update order status");
     } finally {
       setIsUpdatingStatus(false);
+    }
+  };
+
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
+  const handleDownloadInvoice = async (orderId: string, orderNumber: string) => {
+    setIsDownloadingInvoice(true);
+    try {
+      await orderService.downloadInvoice(orderId, orderNumber);
+    } catch (error) {
+      toast.error("Failed to download invoice");
+    } finally {
+      setIsDownloadingInvoice(false);
     }
   };
 
@@ -542,6 +554,16 @@ export const OrdersPage: React.FC = () => {
 
             {/* Actions */}
             <div className="flex justify-end space-x-3 pt-4 border-t">
+              <Button
+                variant="outline"
+                isLoading={isDownloadingInvoice}
+                leftIcon={<FileText className="w-4 h-4" />}
+                onClick={() =>
+                  handleDownloadInvoice(selectedOrder._id, selectedOrder.orderId)
+                }
+              >
+                Download Invoice
+              </Button>
               <Button variant="ghost" onClick={() => setIsViewModalOpen(false)}>
                 Close
               </Button>

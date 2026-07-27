@@ -141,6 +141,8 @@ export interface SupportConfig {
     address?: string;
     workingHours: string;
     chatBotMessages: string; // JSON string
+    companyName?: string;
+    gstNumber?: string;
   };
   isActive: boolean;
   updatedAt: string;
@@ -154,6 +156,8 @@ export interface SupportConfigForm {
   address?: string;
   workingHours: string;
   chatBotMessages: ChatBotMessage[];
+  companyName?: string;
+  gstNumber?: string;
 }
 
 export const systemConfigService = {

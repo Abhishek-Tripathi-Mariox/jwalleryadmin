@@ -12,6 +12,7 @@ import {
   Plus,
   Trash2,
   HelpCircle,
+  FileText,
 } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
@@ -41,6 +42,8 @@ export const SupportConfigPage: React.FC = () => {
     whatsapp: "",
     address: "",
     workingHours: "9:00 AM - 6:00 PM",
+    companyName: "",
+    gstNumber: "",
   });
 
   const [chatBotMessages, setChatBotMessages] = useState<ChatBotMessage[]>(DEFAULT_BOT_MESSAGES);
@@ -62,6 +65,8 @@ export const SupportConfigPage: React.FC = () => {
           whatsapp: response.data.credentials?.whatsapp || "",
           address: response.data.credentials?.address || "",
           workingHours: response.data.credentials?.workingHours || "9:00 AM - 6:00 PM",
+          companyName: response.data.credentials?.companyName || "",
+          gstNumber: response.data.credentials?.gstNumber || "",
         });
         // Parse chatbot messages from JSON string
         if (response.data.credentials?.chatBotMessages) {
@@ -317,6 +322,42 @@ export const SupportConfigPage: React.FC = () => {
               Shown on the website Contact Us page.
             </p>
           </div>
+        </div>
+
+        {/* Business Details (for Invoices) */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="w-5 h-5 text-[#B8860B]" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              Business Details
+            </h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-6">
+            Shown as the "Sold By" seller identity on order invoices (Orders → Download Invoice).
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
+            <Input
+              label="Company / Legal Name"
+              placeholder="e.g., Swarnaz Jewellery Pvt. Ltd."
+              value={formData.companyName}
+              onChange={(e) =>
+                setFormData({ ...formData, companyName: e.target.value })
+              }
+            />
+            <Input
+              label="GSTIN"
+              placeholder="e.g., 22AAAAA0000A1Z5"
+              value={formData.gstNumber}
+              onChange={(e) =>
+                setFormData({ ...formData, gstNumber: e.target.value })
+              }
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-2">
+            The Address above is also used as the billing address on invoices.
+            Leave GSTIN blank if not yet registered — the invoice just omits that line.
+          </p>
         </div>
 
         {/* Chatbot Messages */}

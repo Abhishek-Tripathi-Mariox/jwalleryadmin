@@ -50,6 +50,22 @@ export const orderService = {
     return response.data;
   },
 
+  // Streams a PDF, not the usual JSON envelope — responseType "blob" so axios
+  // doesn't try to parse the binary body as JSON.
+  downloadInvoice: async (id: string, orderNumber: string): Promise<void> => {
+    const response = await api.get(`/admin/orders/${id}/invoice`, {
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `invoice-${orderNumber}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  },
+
   getOrderStats: async (): Promise<
     ApiResponse<{
       total: number;
