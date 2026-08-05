@@ -31,6 +31,11 @@ export const ProductFormPage: React.FC = () => {
     stock: "",
     description: "",
     features: "",
+    sku: "",
+    dimensions: "",
+    occasion: "",
+    collectionName: "",
+    careInstructions: "",
     isFeatured: false,
     isActive: true,
     // Gold-pricing fields. When goldPricingEnabled is true, the website
@@ -126,6 +131,11 @@ export const ProductFormPage: React.FC = () => {
           stock: String(p.stock || ""),
           description: p.description || "",
           features: p.features || "",
+          sku: (p as any).sku || "",
+          dimensions: (p as any).dimensions || "",
+          occasion: (p as any).occasion || "",
+          collectionName: (p as any).collectionName || "",
+          careInstructions: (p as any).careInstructions || "",
           isFeatured: p.isFeatured || false,
           isActive: p.isActive !== false,
           goldPricingEnabled: p.goldPricing?.isEnabled || false,
@@ -286,6 +296,11 @@ export const ProductFormPage: React.FC = () => {
       fd.append("stock", formData.stock);
       fd.append("description", formData.description.trim());
       fd.append("features", formData.features.trim());
+      fd.append("sku", formData.sku.trim());
+      fd.append("dimensions", formData.dimensions.trim());
+      fd.append("occasion", formData.occasion.trim());
+      fd.append("collectionName", formData.collectionName.trim());
+      fd.append("careInstructions", formData.careInstructions.trim());
       fd.append("isFeatured", String(formData.isFeatured));
       fd.append("isActive", String(formData.isActive));
 
@@ -846,6 +861,52 @@ export const ProductFormPage: React.FC = () => {
               value={formData.features}
               onChange={handleChange}
               placeholder="Key features (e.g., 22K gold, BIS hallmarked)..."
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#B8860B] focus:border-transparent resize-none"
+            />
+          </div>
+
+          {/* Fields shown in the app's "Product Details" section — left
+              blank here means that row just doesn't render on the product page. */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Product Code / SKU"
+              name="sku"
+              value={formData.sku}
+              onChange={handleChange}
+              placeholder="e.g., SWZ-EAR-1042"
+            />
+            <Input
+              label="Dimensions"
+              name="dimensions"
+              value={formData.dimensions}
+              onChange={handleChange}
+              placeholder="e.g., 2.5cm x 1.8cm"
+            />
+            <Input
+              label="Occasion"
+              name="occasion"
+              value={formData.occasion}
+              onChange={handleChange}
+              placeholder="e.g., Wedding, Festive"
+            />
+            <Input
+              label="Collection"
+              name="collectionName"
+              value={formData.collectionName}
+              onChange={handleChange}
+              placeholder="e.g., Sundar Keel"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Care Instructions
+            </label>
+            <textarea
+              name="careInstructions"
+              rows={3}
+              value={formData.careInstructions}
+              onChange={handleChange}
+              placeholder="e.g., Avoid contact with perfume and water..."
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#B8860B] focus:border-transparent resize-none"
             />
           </div>
